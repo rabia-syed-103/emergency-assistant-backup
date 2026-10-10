@@ -681,5 +681,283 @@
       }
     ],
     "last_response_at": "2026-10-10T03:55:17.082903Z"
+  },
+  "4pww1oK518MH1D7cNUvqlmvx99C3": {
+    "user_id": "4pww1oK518MH1D7cNUvqlmvx99C3",
+    "active": false,
+    "severity": 1,
+    "type": "injury",
+    "status": "resolved",
+    "location": {
+      "lat": 31.5362925,
+      "lng": 74.2888075
+    },
+    "timeline": [
+      {
+        "timestamp": "2026-10-10T19:18:33.571903Z",
+        "event": "escalated: No response during emergency assessment for 10 seconds"
+      },
+      {
+        "timestamp": "2026-10-10T19:18:42.391758Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T19:19:15.666896Z",
+        "event": "resolved: user marked safe"
+      },
+      {
+        "timestamp": "2026-10-10T19:58:01.246606Z",
+        "event": "escalated: No response during emergency assessment for 10 seconds"
+      },
+      {
+        "timestamp": "2026-10-10T19:58:11.800244Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T19:58:17.525478Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T19:58:36.908410Z",
+        "event": "resolved: user marked safe"
+      },
+      {
+        "timestamp": "2026-10-10T20:10:41.798624Z",
+        "event": "trigger received"
+      },
+      {
+        "timestamp": "2026-10-10T20:11:04.516258Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T20:11:07.348026Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T20:11:09.231591Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T20:11:10.255423Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T20:11:10.559958Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T20:11:10.687854Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T20:11:10.876826Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T20:11:11.237059Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T20:11:11.262055Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T20:11:11.539458Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T20:11:11.691147Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T20:11:11.778588Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T20:11:12.614893Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T20:11:12.619173Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T20:11:12.958255Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T20:11:57.552193Z",
+        "event": "escalated: User requested emergency escalation"
+      },
+      {
+        "timestamp": "2026-10-10T20:12:05.534092Z",
+        "event": "resolved: user marked safe"
+      },
+      {
+        "timestamp": "2026-10-10T20:12:28.577771Z",
+        "event": "trigger received"
+      },
+      {
+        "timestamp": "2026-10-10T20:12:57.269124Z",
+        "event": "resolved: user marked safe"
+      },
+      {
+        "timestamp": "2026-10-10T20:12:59.515880Z",
+        "event": "resolved: user marked safe"
+      },
+      {
+        "timestamp": "2026-10-10T20:13:02.076451Z",
+        "event": "resolved: user marked safe"
+      },
+      {
+        "timestamp": "2026-10-10T20:13:04.849539Z",
+        "event": "resolved: user marked safe"
+      },
+      {
+        "timestamp": "2026-10-10T20:13:06.081089Z",
+        "event": "resolved: user marked safe"
+      },
+      {
+        "timestamp": "2026-10-10T20:13:06.803310Z",
+        "event": "resolved: user marked safe"
+      },
+      {
+        "timestamp": "2026-10-10T20:13:08.003977Z",
+        "event": "resolved: user marked safe"
+      },
+      {
+        "timestamp": "2026-10-10T20:13:34.732877Z",
+        "event": "trigger received"
+      },
+      {
+        "timestamp": "2026-10-10T20:13:56.449388Z",
+        "event": "resolved: user marked safe"
+      },
+      {
+        "timestamp": "2026-10-10T20:14:08.276796Z",
+        "event": "trigger received"
+      },
+      {
+        "timestamp": "2026-10-10T20:14:19.898547Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T20:14:52.558370Z",
+        "event": "resolved: user marked safe"
+      },
+      {
+        "timestamp": "2026-10-10T20:15:02.069428Z",
+        "event": "trigger received"
+      },
+      {
+        "timestamp": "2026-10-10T20:15:13.244030Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T20:15:18.769823Z",
+        "event": "resolved: user marked safe"
+      }
+    ],
+    "last_response_at": "2026-10-10T20:15:18.769812Z"
+  },
+  "3CRXEjF3qVdxCFLV5bcGBGM95rs2": {
+    "user_id": "3CRXEjF3qVdxCFLV5bcGBGM95rs2",
+    "active": false,
+    "severity": 1,
+    "type": "unknown",
+    "status": "resolved",
+    "location": {
+      "lat": 31.5362495,
+      "lng": 74.2887598
+    },
+    "timeline": [
+      {
+        "timestamp": "2026-10-10T19:22:25.840024Z",
+        "event": "escalated: No response during emergency assessment for 10 seconds"
+      },
+      {
+        "timestamp": "2026-10-10T19:22:30.983649Z",
+        "event": "resolved: user marked safe"
+      },
+      {
+        "timestamp": "2026-10-10T19:22:47.638250Z",
+        "event": "escalated: No response during emergency assessment for 10 seconds"
+      },
+      {
+        "timestamp": "2026-10-10T19:22:52.231562Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T19:22:56.448852Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T19:22:59.964171Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T19:22:59.983055Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T19:23:07.234499Z",
+        "event": "resolved: user marked safe"
+      },
+      {
+        "timestamp": "2026-10-10T19:23:52.206471Z",
+        "event": "escalated: No response during emergency assessment for 10 seconds"
+      },
+      {
+        "timestamp": "2026-10-10T19:23:57.195473Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T19:24:01.530958Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T19:24:05.227610Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T19:24:05.972600Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T19:24:17.663268Z",
+        "event": "resolved: user marked safe"
+      }
+    ],
+    "last_response_at": "2026-10-10T19:24:17.663262Z"
+  },
+  "j8WyvtSOxzcoDdstBbNqIuXVD8F2": {
+    "user_id": "j8WyvtSOxzcoDdstBbNqIuXVD8F2",
+    "active": false,
+    "severity": 1,
+    "type": "unknown",
+    "status": "resolved",
+    "location": {
+      "lat": 31.5362801,
+      "lng": 74.2888015
+    },
+    "timeline": [
+      {
+        "timestamp": "2026-10-10T19:40:28.003878Z",
+        "event": "escalated: No response during emergency assessment for 10 seconds"
+      },
+      {
+        "timestamp": "2026-10-10T19:40:39.265450Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T19:40:42.620507Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-10T19:40:56.461095Z",
+        "event": "resolved: user marked safe"
+      }
+    ],
+    "last_response_at": "2026-10-10T19:40:56.461088Z"
   }
 }

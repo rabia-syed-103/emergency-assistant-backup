@@ -31,7 +31,7 @@ def notify_trusted_contacts(user_id: str, severity: int, emergency_type: str, lo
     contact has to have opened the app at least once first. Anyone not yet
     registered is safely skipped, never silently messaged some other way.
     """
-    from app.main import device_tokens, trusted_contacts
+    from app.main import device_tokens, trusted_contacts, _persist_contacts
 
     contacts = trusted_contacts.get(user_id, [])
     notified: list[str] = []
@@ -42,7 +42,9 @@ def notify_trusted_contacts(user_id: str, severity: int, emergency_type: str, lo
             print(f"No registered device token for {contact_id}, skipping.")
             continue
 
-        title = f"EMERGENCY ALERT - {user_id}"
+        from app.services import auth_service
+        sender_name = auth_service._profiles.get(user_id, {}).get("name") or user_id
+        title = f"EMERGENCY ALERT - {sender_name}"
         body = (
             f"Type: {emergency_type}. Severity: {severity}. "
             f"Location: {_location_link(location)}"
@@ -57,6 +59,10 @@ def notify_trusted_contacts(user_id: str, severity: int, emergency_type: str, lo
             response = messaging.send(message)
             print(f"Successfully sent notification to {contact_id}: {response}")
             notified.append(contact_id)
+        except messaging.UnregisteredError:
+            print(f"Stale token for {contact_id}, removing.")
+            device_tokens.pop(contact_id, None)
+            _persist_contacts()
         except Exception as e:
             print(f"Failed to notify {contact_id}: {e}")
 

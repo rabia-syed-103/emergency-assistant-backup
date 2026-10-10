@@ -10,9 +10,10 @@ import 'screens/auth_screen.dart';
 import 'screens/contacts_list_screen.dart';
 import 'screens/home_screen.dart';
 import 'services/deep_link_service.dart'; // <-- ADDED
+import 'config.dart'; // <-- ADDED
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -25,7 +26,7 @@ void main() async {
 
   // <-- ADDED: wire up FCM-based deep link handling before runApp()
   await DeepLinkService.instance.init(
-    baseUrl: 'http://10.120.229.201:8000',
+     baseUrl: AppConfig.baseUrl
   );
 
   runApp(const EmergencyAssistantApp());
@@ -67,7 +68,7 @@ class _EmergencyAssistantAppState extends State<EmergencyAssistantApp> {
 
       final idToken = await currentUser.getIdToken();
       final response = await http.post(
-        Uri.parse('http://10.120.229.201:8000/devices/register'),
+        Uri.parse('${AppConfig.baseUrl}/devices/register'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $idToken',

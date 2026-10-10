@@ -98,7 +98,16 @@ async def add_contact(user_id: str, payload: ContactAddRequest) -> dict[str, str
 
 @app.get("/contacts/{user_id}")
 async def get_contacts(user_id: str) -> dict[str, Any]:
-    return {"user_id": user_id, "contacts": trusted_contacts.get(user_id, [])}
+    ids = trusted_contacts.get(user_id, [])
+    detailed = []
+    for cid in ids:
+        p = auth_service._profiles.get(cid, {})
+        detailed.append({
+            "uid": cid,
+            "name": p.get("name") or cid,
+            "phone_number": p.get("phone_number", ""),
+        })
+    return {"user_id": user_id, "contacts": ids, "contacts_detail": detailed}
 
 
 @app.post("/devices/register")

@@ -17,6 +17,7 @@ class ContactsListScreen extends StatefulWidget {
 class _ContactsListScreenState extends State<ContactsListScreen> {
   bool _isLoading = true;
   List<String> _trusted = [];
+  Map<String, String> _trustedNames = {};
   List<Map<String, dynamic>> _allResults = [];
   Set<String> _adding = {};
   String? _errorMessage;
@@ -54,13 +55,17 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
     }
 
     try {
-      final contacts = await EmergencyService.getContacts(userId: userId);
-      if (!mounted) return;
-      setState(() {
-        _trusted = contacts;
-        _isLoading = false;
-      });
-    } catch (e) {
+    final detail = await EmergencyService.getContactsDetail(userId: userId);
+    if (!mounted) return;
+    setState(() {
+      _trusted = detail.map((c) => c['uid'].toString()).toList();
+      _trustedNames = {
+        for (final c in detail)
+          c['uid'].toString(): (c['name'] ?? c['uid']).toString(),
+      };
+      _isLoading = false;
+    });
+  } catch (e) { 
       if (!mounted) return;
       setState(() {
         _errorMessage = 'Unable to load trusted contacts.';
@@ -190,9 +195,10 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
                     separatorBuilder: (_, __) => const SizedBox(width: 8),
                     itemBuilder: (context, i) {
                       final id = _trusted[i];
+                      final displayName = _trustedNames[id] ?? id;
                       return Chip(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        label: Text(id, style: const TextStyle(fontSize: 12)),
+                        label: Text(displayName,style: const TextStyle(fontSize: 12)),
                         avatar: const Icon(Icons.person, size: 18),
                         onDeleted: () {
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Remove isn\'t available yet.')));

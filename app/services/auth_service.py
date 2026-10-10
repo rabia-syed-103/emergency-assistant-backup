@@ -46,7 +46,7 @@ def verify_token(authorization: Optional[str] = Header(None)) -> dict[str, Any]:
 
     id_token = authorization.removeprefix("Bearer ").strip()
     try:
-        decoded = firebase_auth.verify_id_token(id_token)
+         decoded = firebase_auth.verify_id_token(id_token, clock_skew_seconds=60)
     except Exception as exc:
         raise HTTPException(status_code=401, detail=f"Invalid or expired token: {exc}")
 

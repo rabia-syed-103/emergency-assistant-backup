@@ -2,10 +2,27 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'auth_header_service.dart';
 import 'package:geolocator/geolocator.dart';
+import '../config.dart';
 
 class EmergencyService {
-  static const String _baseUrl = 'http://192.168.18.10:8000';
+   static const String _baseUrl = AppConfig.baseUrl;
+  
 
+  static Future<List<Map<String, dynamic>>> getContactsDetail({
+  required String userId,
+}) async {
+  final authHeader = await AuthHeaderService.getAuthHeader();
+  final response = await http.get(
+    Uri.parse('$_baseUrl/contacts/$userId'),
+    headers: {'Content-Type': 'application/json', ...authHeader},
+  );
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    return (data['contacts_detail'] as List? ?? [])
+        .cast<Map<String, dynamic>>();
+  }
+  throw Exception('Backend error ${response.statusCode}: ${response.body}');
+}
   static Map<String, dynamic> _parseEmergencyResponse(
     Map<String, dynamic> data,
   ) {

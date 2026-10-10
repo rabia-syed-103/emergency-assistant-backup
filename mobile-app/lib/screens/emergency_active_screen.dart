@@ -40,6 +40,10 @@ class _EmergencyActiveScreenState extends State<EmergencyActiveScreen> {
   bool _resolving = false;
 
   bool _iAmSafeArmed = false;
+  Map<String, String> _contactNames = {};
+  bool _loadingHelp = false;
+
+  String _nameOf(String id) => _contactNames[id] ?? id;
 
   @override
   void initState() {
@@ -50,6 +54,11 @@ class _EmergencyActiveScreenState extends State<EmergencyActiveScreen> {
     if (widget.initialData != null) {
       _seedInitialData(widget.initialData!);
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadContactNames();
+      _autoFetchHelp();
+    });
   }
 
   void _seedInitialData(Map<String, dynamic> data) {
@@ -114,6 +123,35 @@ class _EmergencyActiveScreenState extends State<EmergencyActiveScreen> {
     });
   }
 
+    Future<void> _autoFetchHelp() async {
+    if (_nearbyHelp.isNotEmpty) return;
+    setState(() => _loadingHelp = true);
+    try {
+      final result = await EmergencyService.updateCurrentLocation(
+        userId: widget.userId,
+      );
+      if (!mounted) return;
+      _applyEventData(result);
+    } catch (_) {
+      // permission na mile to user manually "Share My Location" daba sakta hai
+    } finally {
+      if (mounted) setState(() => _loadingHelp = false);
+    }
+  }
+
+  Future<void> _loadContactNames() async {
+    try {
+      final detail =
+          await EmergencyService.getContactsDetail(userId: widget.userId);
+      if (!mounted) return;
+      setState(() {
+        _contactNames = {
+          for (final c in detail)
+            c['uid'].toString(): (c['name'] ?? c['uid']).toString(),
+        };
+      });
+    } catch (_) {}
+  }
   // ------------------------------------------------------------
   // MANUAL ESCALATION
   // ------------------------------------------------------------
@@ -395,7 +433,7 @@ class _EmergencyActiveScreenState extends State<EmergencyActiveScreen> {
           (contact) => ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.person),
-            title: Text(contact),
+            title: Text(_nameOf(contact)),
           ),
         ),
       ],
@@ -876,7 +914,7 @@ Widget _buildLevel4() {
                             leading: const Icon(
                               Icons.person,
                             ),
-                            title: Text(contact),
+                            title: Text(_nameOf(contact)),
                           ),
                         )
                         .toList(),
@@ -906,20 +944,30 @@ Widget _buildLevel4() {
               _buildNearbyHelp(
                 withCallButton: true,
               )
-            else
+                        else
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Text(
-                    'No nearby hospitals were found.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.grey.shade700,
-                    ),
-                  ),
+                  child: _loadingHelp
+                      ? const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                            SizedBox(width: 12),
+                            Text('Finding nearby hospitals...'),
+                          ],
+                        )
+                      : Text(
+                          'No nearby hospitals found. Tap "Share My Location" to retry.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey.shade700),
+                        ),
                 ),
               ),
-
             const SizedBox(height: 20),
 
             // ------------------------------------------------
