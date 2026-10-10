@@ -4,7 +4,7 @@ import 'auth_header_service.dart';
 import 'package:geolocator/geolocator.dart';
 
 class EmergencyService {
-  static const String _baseUrl = 'http://10.120.229.201:8000';
+  static const String _baseUrl = 'http://192.168.18.10:8000';
 
   static Map<String, dynamic> _parseEmergencyResponse(
     Map<String, dynamic> data,
@@ -44,41 +44,43 @@ class EmergencyService {
     };
   }
 
-  static Future<Map<String, dynamic>> saveProfile({
-    required String name,
-    required String phone,
-    required String bloodGroup,
-    required DateTime dob,
-  }) async {
-    final uri = Uri.parse('$_baseUrl/users/profile');
+static Future<Map<String, dynamic>> saveProfile({
+  required String name,
+  required String phone,
+  required String bloodGroup,
+  required DateTime dob,
+}) async {
+  final uri = Uri.parse('$_baseUrl/users/profile'); // <-- /users/profile
 
-    final authHeader = await AuthHeaderService.getAuthHeader();
-    if (authHeader.isEmpty) {
-      throw Exception('No authenticated user available for profile save.');
-    }
-
-    final response = await http.post(
-      uri,
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader,
-      },
-      body: jsonEncode({
-        'name': name,
-        'phone_number': phone,
-        'blood_group': bloodGroup,
-        'dob': dob.toIso8601String().split('T').first,
-      }),
-    );
-
-    if (response.statusCode >= 200 && response.statusCode < 300) {
-      return response.body.isEmpty
-          ? <String, dynamic>{}
-          : jsonDecode(response.body) as Map<String, dynamic>;
-    }
-
-    throw Exception('Backend error ${response.statusCode}: ${response.body}');
+  final authHeader = await AuthHeaderService.getAuthHeader();
+  if (authHeader.isEmpty) {
+    throw Exception('No authenticated user available for profile save.');
   }
+
+  final response = await http.post(
+    uri,
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader,
+    },
+    body: jsonEncode({
+      'name': name,
+      'phone_number': phone, // <-- phone_number
+      'blood_group': bloodGroup,
+      'dob': dob.toIso8601String().split('T').first,
+    }),
+  );
+
+  if (response.statusCode >= 200 && response.statusCode < 300) {
+    return response.body.isEmpty
+        ? <String, dynamic>{}
+        : jsonDecode(response.body) as Map<String, dynamic>;
+  }
+
+  throw Exception('Backend error ${response.statusCode}: ${response.body}');
+}
+
+
 
   static Future<Map<String, dynamic>> updateCurrentLocation({
   required String userId,
@@ -148,8 +150,11 @@ class EmergencyService {
   );
 }
 
-  static Future<Map<String, dynamic>> getProfile() async {
-    final uri = Uri.parse('$_baseUrl/users/profile/me');
+
+
+static Future<Map<String, dynamic>> getProfile() async {
+  final uri = Uri.parse('$_baseUrl/users/profile/me'); // <-- /users/profile/me
+  // baqi code same rehne do
 
     final authHeader = await AuthHeaderService.getAuthHeader();
     if (authHeader.isEmpty) {
