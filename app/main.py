@@ -10,6 +10,8 @@ from app.routers import emergency, users
 from app.repository.json_store import load_json, save_json
 import threading
 
+_reload_lock = threading.Lock()
+
 
 app = FastAPI(title="Emergency Backend", version="0.1.0")
 app.add_middleware(
