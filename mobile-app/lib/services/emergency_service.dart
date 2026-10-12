@@ -23,6 +23,47 @@ class EmergencyService {
   }
   throw Exception('Backend error ${response.statusCode}: ${response.body}');
 }
+static Future<List<Map<String, dynamic>>> getIncomingRequests() async {
+  final authHeader = await AuthHeaderService.getAuthHeader();
+  final res = await http.get(
+    Uri.parse('$_baseUrl/requests/incoming'),
+    headers: {'Content-Type': 'application/json', ...authHeader},
+  );
+  if (res.statusCode == 200) {
+    final data = jsonDecode(res.body) as Map<String, dynamic>;
+    return (data['requests'] as List? ?? []).cast<Map<String, dynamic>>();
+  }
+  throw Exception('Backend error ${res.statusCode}: ${res.body}');
+}
+
+static Future<void> respondToRequest({
+  required String fromUid,
+  required bool accept,
+}) async {
+  final authHeader = await AuthHeaderService.getAuthHeader();
+  final action = accept ? 'accept' : 'decline';
+  final res = await http.post(
+    Uri.parse('$_baseUrl/requests/$fromUid/$action'),
+    headers: {'Content-Type': 'application/json', ...authHeader},
+  );
+  if (res.statusCode != 200) {
+    throw Exception('Backend error ${res.statusCode}: ${res.body}');
+  }
+}
+
+static Future<void> removeContact({
+  required String myUserId,
+  required String contactId,
+}) async {
+  final authHeader = await AuthHeaderService.getAuthHeader();
+  final res = await http.delete(
+    Uri.parse('$_baseUrl/contacts/$myUserId/$contactId'),
+    headers: {'Content-Type': 'application/json', ...authHeader},
+  );
+  if (res.statusCode != 200) {
+    throw Exception('Backend error ${res.statusCode}: ${res.body}');
+  }
+}
   static Map<String, dynamic> _parseEmergencyResponse(
     Map<String, dynamic> data,
   ) {

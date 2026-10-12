@@ -3,11 +3,13 @@ from app.services import auth_service
 from collections import defaultdict
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect,Depends
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import emergency, users
 from app.repository.json_store import load_json, save_json
+import threading
+
 
 app = FastAPI(title="Emergency Backend", version="0.1.0")
 app.add_middleware(
@@ -50,6 +52,7 @@ _contacts_data = load_json(
     },
 )
 trusted_contacts: dict[str, list[str]] = _contacts_data.get("trusted_contacts", {})
+pending_requests: dict[str, list[str]] = _contacts_data.get("pending_requests", {})
 
 # contact_id -> real FCM device token. Populated when a person opens the
 # app and it registers their device (POST /devices/register). A contact_id
@@ -65,9 +68,32 @@ device_tokens: dict[str, str] = _contacts_data.get("device_tokens", {})
 def _persist_contacts() -> None:
     save_json(
         "contacts",
-        {"trusted_contacts": trusted_contacts, "device_tokens": device_tokens},
+        {
+            "trusted_contacts": trusted_contacts,
+            "device_tokens": device_tokens,
+            "pending_requests": pending_requests,
+        },
     )
 
+def _reload_from_disk() -> None:
+    with _reload_lock:
+        data = load_json("contacts", default={})
+        trusted_contacts.clear()
+        trusted_contacts.update(data.get("trusted_contacts", {}))
+        device_tokens.clear()
+        device_tokens.update(data.get("device_tokens", {}))
+        pending_requests.clear()
+        pending_requests.update(data.get("pending_requests", {}))
+
+        profiles = load_json("user_profiles", default={})
+        auth_service._profiles.clear()
+        auth_service._profiles.update(profiles)
+
+
+@app.middleware("http")
+async def reload_data_middleware(request, call_next):
+    _reload_from_disk()
+    return await call_next(request)
 
 class ContactAddRequest(BaseModel):
     contact_id: str
@@ -85,16 +111,19 @@ async def healthcheck() -> dict[str, str]:
 
 @app.post("/contacts/{user_id}/add")
 async def add_contact(user_id: str, payload: ContactAddRequest) -> dict[str, str]:
-    if not payload.contact_id or not payload.contact_id.strip():
+    cid = payload.contact_id.strip()
+    if not cid:
         raise HTTPException(status_code=400, detail="contact_id is required")
+    if cid == user_id:
+        raise HTTPException(status_code=400, detail="You cannot add yourself")
+    if cid in trusted_contacts.get(user_id, []):
+        return {"user_id": user_id, "contact_id": cid, "status": "already_added"}
 
-    contact_list = trusted_contacts.setdefault(user_id, [])
-    if payload.contact_id not in contact_list:
-        contact_list.append(payload.contact_id)
+    pending = pending_requests.setdefault(cid, [])
+    if user_id not in pending:
+        pending.append(user_id)
     _persist_contacts()
-
-    return {"user_id": user_id, "contact_id": payload.contact_id, "status": "added"}
-
+    return {"user_id": user_id, "contact_id": cid, "status": "requested"}
 
 @app.get("/contacts/{user_id}")
 async def get_contacts(user_id: str) -> dict[str, Any]:
@@ -103,10 +132,11 @@ async def get_contacts(user_id: str) -> dict[str, Any]:
     for cid in ids:
         p = auth_service._profiles.get(cid, {})
         detailed.append({
-            "uid": cid,
-            "name": p.get("name") or cid,
-            "phone_number": p.get("phone_number", ""),
-        })
+        "uid": cid,
+        "name": p.get("name") or cid,
+        "email": p.get("email", ""),
+        "phone_number": p.get("phone_number", ""),
+    })
     return {"user_id": user_id, "contacts": ids, "contacts_detail": detailed}
 
 
@@ -294,3 +324,51 @@ async def broadcast_to_subscribers(user_id: str, payload: dict[str, Any]) -> Non
 
     for stale in stale_connections:
         subscribers[user_id].discard(stale)
+@app.get("/requests/incoming")
+async def incoming_requests(decoded: dict = Depends(auth_service.verify_token)):
+    uid = decoded["uid"]
+    result = []
+    for from_uid in pending_requests.get(uid, []):
+        p = auth_service._profiles.get(from_uid, {})
+        result.append({
+            "uid": from_uid,
+            "name": p.get("name") or from_uid,
+            "email": p.get("email", ""),
+            "phone_number": p.get("phone_number", ""),
+        })
+    return {"requests": result}
+
+
+@app.post("/requests/{from_uid}/accept")
+async def accept_request(from_uid: str, decoded: dict = Depends(auth_service.verify_token)):
+    uid = decoded["uid"]
+    pending = pending_requests.get(uid, [])
+    if from_uid not in pending:
+        raise HTTPException(status_code=404, detail="Request not found")
+    pending.remove(from_uid)
+    lst = trusted_contacts.setdefault(from_uid, [])
+    if uid not in lst:
+        lst.append(uid)
+    _persist_contacts()
+    return {"status": "accepted"}
+
+
+@app.post("/requests/{from_uid}/decline")
+async def decline_request(from_uid: str, decoded: dict = Depends(auth_service.verify_token)):
+    uid = decoded["uid"]
+    pending = pending_requests.get(uid, [])
+    if from_uid in pending:
+        pending.remove(from_uid)
+        _persist_contacts()
+    return {"status": "declined"}
+
+
+@app.delete("/contacts/{user_id}/{contact_id}")
+async def remove_contact(user_id: str, contact_id: str, decoded: dict = Depends(auth_service.verify_token)):
+    if decoded["uid"] != user_id:
+        raise HTTPException(status_code=403, detail="Not allowed")
+    lst = trusted_contacts.get(user_id, [])
+    if contact_id in lst:
+        lst.remove(contact_id)
+        _persist_contacts()
+    return {"status": "removed"}
