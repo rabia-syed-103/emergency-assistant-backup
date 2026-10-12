@@ -689,8 +689,8 @@
     "type": "injury",
     "status": "resolved",
     "location": {
-      "lat": 31.5362925,
-      "lng": 74.2888075
+      "lat": 31.5154265,
+      "lng": 74.4655439
     },
     "timeline": [
       {
@@ -856,9 +856,77 @@
       {
         "timestamp": "2026-10-10T20:15:18.769823Z",
         "event": "resolved: user marked safe"
+      },
+      {
+        "timestamp": "2026-10-12T04:41:22.018175Z",
+        "event": "escalated: No response during emergency assessment for 10 seconds"
+      },
+      {
+        "timestamp": "2026-10-12T04:41:23.642402Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-12T04:41:40.616438Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-12T04:41:48.883310Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-12T04:44:21.702454Z",
+        "event": "resolved: user marked safe"
+      },
+      {
+        "timestamp": "2026-10-12T04:44:37.397572Z",
+        "event": "escalated: No response during emergency assessment for 10 seconds"
+      },
+      {
+        "timestamp": "2026-10-12T04:44:43.815711Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-12T04:46:19.676435Z",
+        "event": "resolved: user marked safe"
+      },
+      {
+        "timestamp": "2026-10-12T04:46:57.943713Z",
+        "event": "escalated: No response during emergency assessment for 10 seconds"
+      },
+      {
+        "timestamp": "2026-10-12T04:47:00.173769Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-12T04:49:58.930081Z",
+        "event": "resolved: user marked safe"
+      },
+      {
+        "timestamp": "2026-10-12T04:51:29.830804Z",
+        "event": "escalated: No response during emergency assessment for 10 seconds"
+      },
+      {
+        "timestamp": "2026-10-12T04:51:33.515611Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-12T04:52:25.489806Z",
+        "event": "resolved: user marked safe"
+      },
+      {
+        "timestamp": "2026-10-12T05:14:07.688299Z",
+        "event": "escalated: No response during emergency assessment for 10 seconds"
+      },
+      {
+        "timestamp": "2026-10-12T05:14:13.322378Z",
+        "event": "location_update received"
+      },
+      {
+        "timestamp": "2026-10-12T05:14:45.066055Z",
+        "event": "resolved: user marked safe"
       }
     ],
-    "last_response_at": "2026-10-10T20:15:18.769812Z"
+    "last_response_at": "2026-10-12T05:14:45.066031Z"
   },
   "3CRXEjF3qVdxCFLV5bcGBGM95rs2": {
     "user_id": "3CRXEjF3qVdxCFLV5bcGBGM95rs2",

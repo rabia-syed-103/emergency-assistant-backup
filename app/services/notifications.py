@@ -32,9 +32,13 @@ def notify_trusted_contacts(user_id: str, severity: int, emergency_type: str, lo
     registered is safely skipped, never silently messaged some other way.
     """
     from app.main import device_tokens, trusted_contacts, _persist_contacts
+    from app.services import auth_service
 
     contacts = trusted_contacts.get(user_id, [])
     notified: list[str] = []
+
+    sender = auth_service._profiles.get(user_id, {})
+    sender_name = sender.get("name") or user_id
 
     for contact_id in contacts:
         device_token = device_tokens.get(contact_id)
@@ -42,8 +46,6 @@ def notify_trusted_contacts(user_id: str, severity: int, emergency_type: str, lo
             print(f"No registered device token for {contact_id}, skipping.")
             continue
 
-        from app.services import auth_service
-        sender_name = auth_service._profiles.get(user_id, {}).get("name") or user_id
         title = f"EMERGENCY ALERT - {sender_name}"
         body = (
             f"Type: {emergency_type}. Severity: {severity}. "
@@ -52,6 +54,18 @@ def notify_trusted_contacts(user_id: str, severity: int, emergency_type: str, lo
 
         message = messaging.Message(
             notification=messaging.Notification(title=title, body=body),
+            data={
+                "type": "emergency_alert",
+                "user_id": user_id,
+                "user_name": sender_name,
+                "phone_number": sender.get("phone_number", ""),
+                "blood_group": sender.get("blood_group", ""),
+                "severity": str(severity),
+                "emergency_type": str(emergency_type),
+                "lat": str(location.get("lat", "")),
+                "lng": str(location.get("lng", "")),
+            },
+            android=messaging.AndroidConfig(priority="high"),
             token=device_token,
         )
 

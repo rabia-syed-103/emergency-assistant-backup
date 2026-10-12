@@ -5,14 +5,22 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 class DashboardScreen extends StatefulWidget {
   final String userId;
-  final String baseUrl; // e.g. https://your-api.com
- 
+  final String baseUrl;
+  final String? userName;
+  final String? phoneNumber;
+  final String? bloodGroup;
+
   const DashboardScreen({
     super.key,
     required this.userId,
     required this.baseUrl,
+    this.userName,
+    this.phoneNumber,
+    this.bloodGroup,
   });
  
   @override
@@ -126,7 +134,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       backgroundColor: const Color(0xFF0F1115),
       appBar: AppBar(
         backgroundColor: const Color(0xFF15181E),
-        title: Text('Responder — ${widget.userId}'),
+        title: Text(widget.userName != null
+    ? 'Emergency — ${widget.userName}'
+    : 'Responder — ${widget.userId}'),
         elevation: 0,
         actions: [
           if (_loading)
@@ -210,7 +220,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 style: TextStyle(color: Colors.white54, fontSize: 13),
               ),
             ),
- 
+            if (widget.userName != null) ...[
+            _sectionCard(
+              title: 'Person in emergency',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(widget.userName!,
+                      style: const TextStyle(
+                          color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                  if ((widget.bloodGroup ?? '').isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Text('Blood group: ${widget.bloodGroup}',
+                        style: const TextStyle(color: Colors.white70)),
+                  ],
+                  if ((widget.phoneNumber ?? '').isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    ElevatedButton.icon(
+                      onPressed: () =>
+                          launchUrl(Uri(scheme: 'tel', path: widget.phoneNumber)),
+                      icon: const Icon(Icons.call),
+                      label: Text('Call ${widget.phoneNumber}'),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
           // Severity + type + status row
           Row(
             children: [
@@ -259,7 +296,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   children: [
                     TileLayer(
                       urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      userAgentPackageName: 'com.example.responder',
+                      userAgentPackageName: 'com.example.emergency_assistant',
                     ),
                     MarkerLayer(
                       markers: [
@@ -275,6 +312,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
             ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () => launchUrl(
+                    Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng'),
+                    mode: LaunchMode.externalApplication,
+                  ),
+                  icon: const Icon(Icons.directions),
+                  label: const Text('Open in Google Maps'),
+                ),
+              ),
             const SizedBox(height: 16),
           ] else
             Container(

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import '../config.dart';
 
 import '../responder/dashboard_screen.dart'; // adjust path if dashboard_screen.dart lives elsewhere
 
@@ -19,7 +20,7 @@ class DeepLinkService {
   /// navigatorKey.currentState stays null and navigation silently fails.
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-  String baseUrl = 'http://192.168.10.11:8000';
+  String baseUrl = AppConfig.baseUrl;
 
   StreamSubscription<RemoteMessage>? _onMessageSub;
   StreamSubscription<RemoteMessage>? _onMessageOpenedAppSub;
@@ -59,49 +60,60 @@ class DeepLinkService {
   }
 
   void _handleMessage(RemoteMessage message, {required bool openedFromTap}) {
-    final userId = message.data['user_id']?.toString();
-    if (userId == null || userId.isEmpty) {
-      debugPrint('DeepLinkService: no user_id in payload, ignoring. data=${message.data}');
-      return;
-    }
+  final data = message.data;
+  if (data['type'] != 'emergency_alert') return;
 
-    if (openedFromTap) {
-      _openDashboard(userId);
-    } else {
-      _showForegroundBanner(userId, message);
-    }
+  final userId = data['user_id']?.toString();
+  if (userId == null || userId.isEmpty) {
+    debugPrint('DeepLinkService: no user_id, data=$data');
+    return;
   }
 
-  void _openDashboard(String userId) {
-    final navState = navigatorKey.currentState;
-    if (navState == null) return;
+  if (openedFromTap) {
+    _openDashboard(data);
+  } else {
+    _showForegroundBanner(data, message);
+  }
+}
 
-    navState.push(
-      MaterialPageRoute(
-        builder: (_) => DashboardScreen(userId: userId, baseUrl: baseUrl),
+  void _openDashboard(Map<String, dynamic> data) {
+  final navState = navigatorKey.currentState;
+  if (navState == null) return;
+
+  navState.push(
+    MaterialPageRoute(
+      builder: (_) => DashboardScreen(
+        userId: data['user_id'].toString(),
+        baseUrl: baseUrl,
+        userName: data['user_name']?.toString(),
+        phoneNumber: data['phone_number']?.toString(),
+        bloodGroup: data['blood_group']?.toString(),
       ),
-    );
-  }
+    ),
+  );
+}
 
-  void _showForegroundBanner(String userId, RemoteMessage message) {
-    final overlayContext = navigatorKey.currentState?.overlay?.context;
-    if (overlayContext == null) return;
+  void _showForegroundBanner(Map<String, dynamic> data, RemoteMessage message) {
+  final overlayContext = navigatorKey.currentState?.overlay?.context;
+  if (overlayContext == null) return;
 
-    ScaffoldMessenger.maybeOf(overlayContext)?.showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: const Color(0xFF1A1D24),
-        content: Text(
-          message.notification?.title ?? 'New emergency alert: $userId',
-          style: const TextStyle(color: Colors.white),
-        ),
-        action: SnackBarAction(
-          label: 'VIEW',
-          textColor: const Color(0xFF5B8CFF),
-          onPressed: () => _openDashboard(userId),
-        ),
-        duration: const Duration(seconds: 6),
+  final name = data['user_name']?.toString() ?? 'Someone';
+
+  ScaffoldMessenger.maybeOf(overlayContext)?.showSnackBar(
+    SnackBar(
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: const Color(0xFF1A1D24),
+      content: Text(
+        '$name ne emergency alert bheja hai',
+        style: const TextStyle(color: Colors.white),
       ),
-    );
-  }
+      action: SnackBarAction(
+        label: 'VIEW',
+        textColor: const Color(0xFF5B8CFF),
+        onPressed: () => _openDashboard(data),
+      ),
+      duration: const Duration(seconds: 8),
+    ),
+  );
+}
 }

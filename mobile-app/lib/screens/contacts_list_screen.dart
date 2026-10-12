@@ -138,23 +138,23 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
     return RegExp(r"^\+?[0-9]{6,15}").hasMatch(s);
   }
 
-  Future<void> _callNumber(String number) async {
-    final uri = Uri.parse('tel:$number');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Cannot place a call on this device')));
-    }
+Future<void> _callNumber(String number) async {
+  final ok = await launchUrl(Uri(scheme: 'tel', path: number));
+  if (!ok && mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Cannot place a call on this device')),
+    );
   }
+}
 
-  Future<void> _smsNumber(String number) async {
-    final uri = Uri.parse('sms:$number');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Cannot send SMS on this device')));
-    }
+Future<void> _smsNumber(String number) async {
+  final ok = await launchUrl(Uri(scheme: 'sms', path: number));
+  if (!ok && mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Cannot send SMS on this device')),
+    );
   }
+}
 
   void _openAddScreen() {
     Navigator.of(context)
